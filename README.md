@@ -29,20 +29,20 @@ UART handler is also passing the receiving data from uart to MQTT topic `dev/nod
 
 Status register bits explanation:
 ```
-rrrmwwaaa
+rrmspaaa
+00111101
 
-rrr - reserved / unused
+rr  - reserved / unused
 m   - 1 if MQTT is connected, 0 otherwise
-ww  - 00 waiting for ssid and wifi password (after poweron / reboot)
-    - 01 got ssid, waiting for wifi password
-    - 11 got ssid, got wifi password
+s   - 0 means waiting for ssid input (after power-on / reboot), 1 means got ssid
+p   - 0 means waiting for wifi password (should be entered immediately after ssid), 1 means got wifi password
 aaa - convert these bits to decimal and see the wifi.sta.status() return values - https://github.com/nodemcu/nodemcu-firmware/wiki/nodemcu_api_en#wifistastatus
 ```
 
 For example:
 ```
-000111101 means: connected to MQTT broker, got SSID, got wifi password, STATION_GOT_IP
-000000101 means: connected to AP but waiting for SSID and wifi password input, not connected to MQTT broker. This happens after reboot.
+00111101 means: connected to MQTT broker, got SSID, got wifi password, STATION_GOT_IP
+00000101 means: connected to AP but waiting for SSID and wifi password input, not connected to MQTT broker. This happens after reboot.
 ```
 
 Code is written in such manner that it should reconnect if connection to MQTT broker goes offline for some reason. It also reconnects if WIFI AP disappears and appears later. I tried this.
