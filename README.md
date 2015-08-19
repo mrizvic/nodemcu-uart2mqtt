@@ -37,6 +37,12 @@ m   - 1 if MQTT is connected, 0 otherwise
 s   - 0 means waiting for ssid input (after power-on / reboot), 1 means got ssid
 p   - 0 means waiting for wifi password (should be entered immediately after ssid), 1 means got wifi password
 aaa - convert these bits to decimal and see the wifi.sta.status() return values - https://github.com/nodemcu/nodemcu-firmware/wiki/nodemcu_api_en#wifistastatus
+    000 = 0: STATION_IDLE,
+    001 = 1: STATION_CONNECTING,
+    010 = 2: STATION_WRONG_PASSWORD,
+    011 = 3: STATION_NO_AP_FOUND,
+    100 = 4: STATION_CONNECT_FAIL,
+    101 = 5: STATION_GOT_IP.
 ```
 
 For example:
@@ -48,9 +54,10 @@ For example:
 Code is written in such manner that it should reconnect if connection to MQTT broker goes offline for some reason. It also reconnects if WIFI AP disappears and appears later. I tried this.
 
 ## Prerequisites
-
+```
 -lua firmware on nodemcu / esp8266
 -tool to upload .lua files
+```
 
 Note: after uploading `mqttbridge.lua` you must compile it because `init.lua` executes `mqttbridge.lc` file after succesful connection with WIFI AP.
 
