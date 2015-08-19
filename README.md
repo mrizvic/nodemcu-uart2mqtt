@@ -40,8 +40,10 @@ aaa - convert these bits to decimal and see the wifi.sta.status() return values 
 ```
 
 For example:
+```
 000111101 means: connected to MQTT broker, got SSID, got wifi password, STATION_GOT_IP
 000000101 means: connected to AP but waiting for SSID and wifi password input, not connected to MQTT broker. This happens after reboot.
+```
 
 Code is written in such manner that it should reconnect if connection to MQTT broker goes offline for some reason. It also reconnects if WIFI AP disappears and appears later. I tried this.
 
