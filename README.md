@@ -56,7 +56,7 @@ Code is written in such manner that it should reconnect if connection to MQTT br
 
 ## Flowchart diagram
 
-![flowchart diagram](https://raw.githubusercontent.com/mrizvic/nodemcu-uart2mqtt/master/flowchart.jpg)
+![flowchart diagram](https://raw.githubusercontent.com/mrizvic/nodemcu-uart2mqtt/master/flowchart.png)
 
 ## Schematics
 I suggest you connect your ESP8266 or nodemcu to ARDUINO in similar fashion as it is described in this blogpost: http://microcontrollerkits.blogspot.com/2015/02/wifi-module-esp8266-at-command-test.html
