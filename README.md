@@ -54,6 +54,10 @@ For example:
 
 Code is written in such manner that it should reconnect if connection to MQTT broker goes offline for some reason. It also reconnects if WIFI AP disappears and appears later. I tried this.
 
+## Installation
+
+Just upload init.lua to your nodemcu / esp8266 using your favourite esp file uploader :) I find it easy with http://esp8266.ru/esplorer/ . I tried on Windows 7 and Linux.
+
 ## Flowchart diagrams
 
 ![nodemcu init](https://raw.githubusercontent.com/mrizvic/nodemcu-uart2mqtt/master/nodemcuinit.png)
