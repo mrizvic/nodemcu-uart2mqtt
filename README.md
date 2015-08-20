@@ -2,7 +2,7 @@
 
 ## What is it
 
-The purpose of this code is to make simple bridge between any UART enabled system (Arduino, etc) and MQTT broker. User should simply send and receive data from UART enabled application and also send and receive data by publishing and subscribing on predefined topics on MQTT broker. Data received on nodemcu UART RX pin will be published on topic `dev/nodemcu/tx`. Data received on topic `dev/nodemcu/rx` will be sent out via nodemcu UART TX pin. Some special characters and commands are defined in order to see nodemcu status. See flowchart diagram and description below for details.
+The purpose of this code is to make simple bridge between any UART enabled system (Arduino, etc) and MQTT broker over WIFI network. User should simply send and receive data from UART enabled application and also send and receive data by publishing and subscribing on predefined topics on MQTT broker. Data received on nodemcu UART RX pin will be published on topic `dev/nodemcu/tx`. Data received on topic `dev/nodemcu/rx` will be sent out via nodemcu UART TX pin. Some special characters and commands are defined in order to see nodemcu status. See flowchart diagram and description below for details.
 
 ## How it works
 
