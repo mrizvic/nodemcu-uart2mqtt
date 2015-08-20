@@ -13,8 +13,8 @@ The first thing to be done is to pass to nodemcu which SSID and password should 
 
 After nodemcu is powered up it spits out some info at 115200 baud and then switches to 9600 where LUA interpreter executes `init.lua`. UART handling routine is then initialised which waits for SSID and WIFI password. You should send it to nodemcu like this:
 ```
-myssid\r
-wifipassword\r
+myssid\r\n
+wifipassword\r\n
 ```
 
 After receiving this it tries to connect to AP and after that it should establish connection with MQTT broker. MQTT settings are hardcoded at the moment so you MUST change variables named with MQTT* in order to connect your nodemcu to your MQTT broker installation.
