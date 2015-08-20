@@ -54,7 +54,11 @@ For example:
 
 Code is written in such manner that it should reconnect if connection to MQTT broker goes offline for some reason. It also reconnects if WIFI AP disappears and appears later. I tried this.
 
-## Flowchart diagram
+## Flowchart diagrams
+
+![nodemcu init](https://raw.githubusercontent.com/mrizvic/nodemcu-uart2mqtt/master/nodemcuinit.png)
+
+![bridge communication](https://raw.githubusercontent.com/mrizvic/nodemcu-uart2mqtt/master/bridgecommunication.png)
 
 ![flowchart diagram](https://raw.githubusercontent.com/mrizvic/nodemcu-uart2mqtt/master/flowchart.png)
 
