@@ -12,11 +12,13 @@ UART_TERMINATORS='[\r\n]'
 
 MQTTCLIENTID = "nodemcu"
 MQTTSRV = '192.168.168.168'
-MQTTPORT = 1883
-MQTTUSER = 'username'
-MQTTPASS = 'password'
+MQTTPORT = 2883
+MQTTUSER = 'user'
+MQTTPASS = 'pass'
 MQTTRECONNECT=false
+-- dont set MQTTKEEPALIVE too low!
 MQTTKEEPALIVE=15
+MQTTKEEPALIVETOPIC='dummy'
 RXTOPIC = "dev/" .. MQTTCLIENTID .. "/rx"
 TXTOPIC = "dev/" .. MQTTCLIENTID .. "/tx"
 BCASTTOPIC = "clients"
@@ -32,6 +34,12 @@ end)
 tmr.alarm(2, 5000, 1, function()
     if bit.isclear(MQTT_REGISTER, MQTT_CONNECTED_FLAG) and MQTTRECONNECT then
         mqtt_connect()
+    end
+end)
+
+tmr.alarm(4, (MQTTKEEPALIVE-1)*1000, 1, function()
+    if bit.isset(MQTT_REGISTER, MQTT_CONNECTED_FLAG) then
+        m:publish(MQTTKEEPALIVETOPIC,'.', 0, 0, function(conn) end )
     end
 end)
 
@@ -73,7 +81,7 @@ uart.on("data", UART_TERMINATOR1, function(data)
             else
                 tmr.stop(3)
                 SSID_REGISTER=bit.set(SSID_REGISTER, GOT_IP_FLAG)
-                -- set reconnect flag and let tmr.alarm(2,..) kick in
+                -- set reconnect flag and let tmr.alarm(2, ...) kick in
                 MQTTRECONNECT=true
             end
         end)
@@ -124,3 +132,4 @@ m:on("message", function(conn, topic, data)
       uart.write(0, STATUS_REGISTER, data)
   end
 end)
+
