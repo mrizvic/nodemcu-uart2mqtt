@@ -80,7 +80,7 @@ For Arduino **3.3V** Power Supply and Logic
 
 ## Prerequisites
 ```
--lua firmware on nodemcu / esp8266
+-lua firmware on nodemcu / esp8266 - im using nodemcu_float_0.9.6-dev_20150704.bin from https://github.com/nodemcu/nodemcu-firmware/releases
 -tool to upload .lua files
 ```
 
