@@ -56,7 +56,7 @@ Code is written in such manner that it should reconnect if connection to MQTT br
 
 ## Installation
 
-Before uploading init.lua to nodemcu you should inspect global variables and edit at least `MQTTSRV` and point it to your MQTT broker IP. Variables like `MQTTPORT`, `MQTTUSER`, `MQTTPASS` should be set according to your MQTT setup. If your dont user username and password authentication in your MQTT setup then you MUST set both `MQTTUSER` and `MQTTPASS` variables to nil:
+Before uploading init.lua to nodemcu you should inspect global variables and edit at least `MQTTSRV` and point it to your MQTT broker IP. Variables like `MQTTPORT`, `MQTTUSER`, `MQTTPASS` should be set according to your MQTT setup. If you dont use user/pass authentication in your MQTT setup then you MUST set both `MQTTUSER` and `MQTTPASS` variables to nil:
 ```
 MQTTUSER=nil
 MQTTPASS=nil
