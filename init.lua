@@ -46,7 +46,7 @@ end)
 -- initialise custom UART handler
 -- be careful as this steals LUA interpreter
 uart.on("data", UART_TERMINATOR1, function(data)
-    uart.write(0, STATUS_REGISTER)
+    uart.write(0, STATUS_REGISTER, UART_TERMINATOR1)
     local s = string.gsub(data, UART_TERMINATORS, "") -- remove termination characters
     if s == 'uartstop' then
         -- return to lua interpreter
@@ -74,6 +74,7 @@ uart.on("data", UART_TERMINATOR1, function(data)
     elseif bit.isclear(SSID_REGISTER, WIFIPASSWORD_RECEIVED_FLAG) then
         wificfg.pwd=s
         SSID_REGISTER=bit.set(SSID_REGISTER, WIFIPASSWORD_RECEIVED_FLAG)
+		wifi.setmode(wifi.STATION)
         wifi.sta.config(wificfg.ssid, wificfg.pwd)
         wifi.sta.autoconnect(1)
         tmr.alarm(3, 200, 1, function()
@@ -89,7 +90,7 @@ uart.on("data", UART_TERMINATOR1, function(data)
         m:publish(TXTOPIC, s, 0, 0, function(conn) end )
     else
         -- uh-oh?
-        uart.write(0,'undefined error')
+        uart.write(0,'undefined error', UART_TERMINATOR1)
     end
 end, 0)
 
@@ -129,7 +130,7 @@ m:on("message", function(conn, topic, data)
   elseif data == 'heap' and topic == CMDTOPIC then
     m:publish(BCASTTOPIC, "heap " .. MQTTCLIENTID .. " " .. node.heap(), 0, 0, function(conn) end )
   elseif data ~= nil and topic == RXTOPIC then
-      uart.write(0, STATUS_REGISTER, data)
+      uart.write(0, STATUS_REGISTER, data, UART_TERMINATOR1)
   end
 end)
 
