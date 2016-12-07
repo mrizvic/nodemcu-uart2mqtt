@@ -2,19 +2,19 @@
 
 ## What is it
 
-The purpose of this code is to make simple bridge between any UART enabled system (Arduino, etc) and MQTT broker over WIFI network. User should simply send and receive data from UART enabled application and also send and receive data by publishing and subscribing on predefined topics on MQTT broker. Data received on nodemcu UART RX pin will be published on topic `dev/nodemcu/tx`. Data received on topic `dev/nodemcu/rx` will be sent out via nodemcu UART TX pin. Some special characters and commands are defined in order to see nodemcu status. See flowchart diagram and description below for details.
+The purpose of this code is to make simple bridge between any UART enabled system (Arduino, etc) and MQTT broker over WIFI network. User should simply send and receive data from UART enabled application and also send and receive data by publishing and subscribing on predefined topics on MQTT broker. Data received on nodemcu UART RX pin will be published on topic `TXTOPIC`. Data received on topic `RXTOPIC` will be sent out via nodemcu UART TX pin. Some special characters and commands are defined in order to see nodemcu status. See flowchart diagram and description below for details.
 
 ## How it works
 
 When you power up nodemcu the UART handling routine is initialised and waits for user input.
-The desired data should be terminated by `\n` (carriage return) character termination at the end. This character is defined in `UART_TERMINATOR1` variable.
+The desired data should be terminated by `\r` (carriage return) character termination at the end. This character is defined in `UART_TERMINATOR1` variable.
 Aftere receiving `string\r\n` the nodemcu strips all `\r' and `\n` characters and then immediately responds with STATUS_REGISTER byte. Then it examines string from input and takes appropriate action.
 The first thing to be done is to pass to nodemcu which SSID and password should be used to connect to WIFI.
 
-After nodemcu is powered up it spits out some info at 115200 baud and then switches to 9600 where LUA interpreter executes `init.lua`. UART handling routine is then initialised which waits for SSID and WIFI password. You should send it to nodemcu like this:
+After nodemcu is powered up the LUA interpreter executes `init.lua`. UART handling routine is then initialised which waits for SSID and WIFI password. You should send it to nodemcu like this:
 ```
-myssid\r\n
-wifipassword\r\n
+myssid\r
+wifipassword\r
 ```
 
 After receiving this it tries to connect to AP and after that it should establish connection with MQTT broker. MQTT settings are hardcoded at the moment so you MUST change variables named with MQTT* in order to connect your nodemcu to your MQTT broker installation.
@@ -24,8 +24,8 @@ If you send `0xf0` the nodemcu responds with one byte which represents status re
 If you send `0xf3` the nodemcu disconnects from MQTT broker and reboots.
 You can also send `uartstop` which removes UART handling routine currently in place and returns you back to the LUA interpreter.
 
-After successful connection to MQTT broker nodemcu subscribes to `clients/cmds` and `dev/nodemcu/sub` topics. It also publishes its presence on topic `clients` saying `hi nodemcu 192.168.x.y`. IP address is replaced with its IP address on your network. It also informs MQTT broker with last will and testament of stating `bye nodemcu` on topic `clients`. Nodemcu reponds to `uptime` command on `clients/cmd` topic. It responds with `pong nodemcu 192.168.x.y` back to `clients` topic.
-UART handler is also passing the receiving data from uart to MQTT topic `dev/nodemcu/pub`. If anything is received on `dev/nodemcu/sub` it is passed to UART. The first byte it sends out on UART is always status register value.
+After successful connection to MQTT broker nodemcu subscribes to `CMDTOPIC` and `RXTOPIC` topics. It also publishes its presence on topic `BCASTTOPIC` saying `hi nodemcu 192.168.x.y`. IP address is replaced with its IP address on your network. It also informs MQTT broker with last will and testament of stating `bye MQTTCLIENTID` on topic `BCASTTOPIC`. Nodemcu reponds to `uptime` command on `CMDTOPIC` topic. It responds with `pong nodemcu 192.168.x.y` back to `clients` topic.
+UART handler is also passing the receiving data from uart to MQTT topic `TXTOPIC`. If anything is received on `RXTOPIC` it is passed to UART. The first byte it sends out on UART is always status register value.
 
 Status register bits explanation:
 ```
