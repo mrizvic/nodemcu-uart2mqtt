@@ -1,20 +1,26 @@
 -- variables
 wificfg={}
 STATUS_REGISTER=0
+STATUS_REGISTER_TEMP=0
 MQTT_REGISTER=0
 SSID_REGISTER=0
 GOT_IP_FLAG=3
 SSID_RECEIVED_FLAG=4
 WIFIPASSWORD_RECEIVED_FLAG=5
 MQTT_CONNECTED_FLAG=6
-UART_TERMINATOR1='\n'
+UART_TERMINATOR1='\r'
 UART_TERMINATORS='[\r\n]'
 
-MQTTCLIENTID = "nodemcu"
-MQTTSRV = '192.168.168.168'
-MQTTPORT = 2883
-MQTTUSER = 'user'
-MQTTPASS = 'pass'
+MYMAC=wifi.sta.getmac()
+-- split MAC address into two strings without colons
+MYMACA=string.sub(MYMAC,0,2) .. string.sub(MYMAC,4,5) .. string.sub(MYMAC,7,8)
+MYMACB=string.sub(MYMAC,10,11) .. string.sub(MYMAC,13,14) .. string.sub(MYMAC,16,17)
+
+MQTTCLIENTID = "nodemcu" .. MYMACB
+MQTTSRV = 'mqtt.dmz6.net'
+MQTTPORT = 1883
+MQTTUSER = nil
+MQTTPASS = nil                     
 MQTTRECONNECT=false
 -- dont set MQTTKEEPALIVE too low!
 MQTTKEEPALIVE=15
@@ -24,10 +30,18 @@ TXTOPIC = "dev/" .. MQTTCLIENTID .. "/tx"
 BCASTTOPIC = "clients"
 CMDTOPIC = "clients/cmd"
 
+-- setup ESP8266 as WIFI client
+wifi.setmode(wifi.STATION)
+
 -- update status register periodicaly
 tmr.alarm(1, 250, 1, function()
     STATUS_REGISTER=wifi.sta.status()
     STATUS_REGISTER=bit.bor(STATUS_REGISTER, MQTT_REGISTER, SSID_REGISTER)
+    -- send update
+    if STATUS_REGISTER_TEMP ~= STATUS_REGISTER then
+        uart.write(0, STATUS_REGISTER, UART_TERMINATOR1)
+    end
+    STATUS_REGISTER_TEMP=STATUS_REGISTER
 end)
 
 -- try to reconnect to MQTT if not connected
@@ -46,7 +60,7 @@ end)
 -- initialise custom UART handler
 -- be careful as this steals LUA interpreter
 uart.on("data", UART_TERMINATOR1, function(data)
-    uart.write(0, STATUS_REGISTER, UART_TERMINATOR1)
+    -- uart.write(0, STATUS_REGISTER, UART_TERMINATOR1)
     local s = string.gsub(data, UART_TERMINATORS, "") -- remove termination characters
     if s == 'uartstop' then
         -- return to lua interpreter
@@ -74,7 +88,6 @@ uart.on("data", UART_TERMINATOR1, function(data)
     elseif bit.isclear(SSID_REGISTER, WIFIPASSWORD_RECEIVED_FLAG) then
         wificfg.pwd=s
         SSID_REGISTER=bit.set(SSID_REGISTER, WIFIPASSWORD_RECEIVED_FLAG)
-		wifi.setmode(wifi.STATION)
         wifi.sta.config(wificfg.ssid, wificfg.pwd)
         wifi.sta.autoconnect(1)
         tmr.alarm(3, 200, 1, function()
@@ -90,8 +103,9 @@ uart.on("data", UART_TERMINATOR1, function(data)
         m:publish(TXTOPIC, s, 0, 0, function(conn) end )
     else
         -- uh-oh?
-        uart.write(0,'undefined error', UART_TERMINATOR1)
+        uart.write(0, 'undefined error', UART_TERMINATOR1)
     end
+    uart.write(0, STATUS_REGISTER, UART_TERMINATOR1)
 end, 0)
 
 -- initialise mqtt_connect() function, client object and events
@@ -103,6 +117,7 @@ mqtt_connect = function ()
             m:subscribe(CMDTOPIC, 0, function(conn) end )
             m:publish(BCASTTOPIC, "hi " .. MQTTCLIENTID .. " " .. wifi.sta.getip(), 0, 0, function(conn) end )
             MQTT_REGISTER=bit.set(MQTT_REGISTER, MQTT_CONNECTED_FLAG)
+            -- uart.write(0, STATUS_REGISTER, data, UART_TERMINATOR1)
         end)
     else
     end
@@ -133,4 +148,3 @@ m:on("message", function(conn, topic, data)
       uart.write(0, STATUS_REGISTER, data, UART_TERMINATOR1)
   end
 end)
-
